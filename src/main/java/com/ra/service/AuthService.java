@@ -1,8 +1,9 @@
 package com.ra.service;
 
-import com.ra.model.dto.UserLoginRequestDto;
-import com.ra.model.dto.UserLoginResponse;
+import com.ra.model.dto.*;
 
 public interface AuthService {
-    UserLoginResponse login(UserLoginRequestDto request);
+    UserSignInResponse login(UserSignInRequestDto request);
+    UserSignUpResponseDto register(UserSignUpRequestDto request);
+    UserSignUpResponseDto updatePermission(UserPermissionDto request,Long userId) throws Exception;
 }

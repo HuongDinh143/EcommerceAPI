@@ -1,10 +1,7 @@
 package com.ra.model.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -15,6 +12,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,8 +23,8 @@ public class User {
     private String password;
     @Column(name = "email")
     private String email;
-    @Column(name = "fullname")
-    private String fullname;
+    @Column(name = "full_name")
+    private String fullName;
     @Column(name = "phone")
     private String phone;
     @Column(name = "address")
