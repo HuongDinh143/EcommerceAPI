@@ -46,10 +46,11 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
     //Lấy về token gửi lên từ request
     public String getTokenFromRequest(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
-        if (header != null && !header.startsWith("Bearer ")) {
-            return header.substring(7);
+        // Kiểm tra nếu header có bắt đầu bằng "Bearer "
+        if (header != null && header.startsWith("Bearer ")) {
+            return header.substring(7); // Cắt bỏ "Bearer " và chỉ lấy token
         }
-        return header;
-
+        return null;
     }
+
 }
