@@ -38,7 +38,7 @@ public class SecurityConfig {
                             .requestMatchers("/api/v1/admin/**").hasAnyAuthority("ROLE_ADMIN")
                             .requestMatchers("/api/v1/user", "/api/v1/user/**").hasAnyAuthority("ROLE_USER")
                             .requestMatchers("/api/v1/home", "/api/v1/auth/**").permitAll()
-                            .requestMatchers("/api/v1/products/**").permitAll()
+                            .requestMatchers("/api/v1/products/**","api/v1/categories/**").permitAll()
                             .anyRequest().authenticated();
                 }).sessionManagement(auth->auth.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).
                 exceptionHandling(auth->auth.authenticationEntryPoint(jwtEntrypoint).accessDeniedHandler(customAccessDeniedHandler)).

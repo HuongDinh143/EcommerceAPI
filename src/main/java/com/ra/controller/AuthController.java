@@ -25,4 +25,5 @@ public class AuthController {
         UserSignUpResponseDto userSignUpResponseDto = authService.register(requestDto);
         return new ResponseEntity<>(userSignUpResponseDto, HttpStatus.OK);
     }
+
 }

@@ -22,6 +22,7 @@ public class Product {
     @Column(name = "sku")
     private String sku = UUID.randomUUID().toString();
     @Column(name = "product_name")
+    
     private String productName;
     @Column(name = "description")
     private String description;
@@ -33,6 +34,8 @@ public class Product {
     private String image;
     private LocalDate createdAt;
     private LocalDate updatedAt;
+    @Column(name = "is_featured")
+    private Boolean isFeatured;
     @ManyToOne
     @JoinColumn(name = "cat_id",referencedColumnName = "id")
     private Category category;

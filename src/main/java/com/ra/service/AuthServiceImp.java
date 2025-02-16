@@ -28,6 +28,8 @@ public class AuthServiceImp implements AuthService {
     private RoleRepository roleRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private UploadService uploadService;
     @Override
     public UserSignInResponse login(UserSignInRequestDto request) {
         Authentication authentication;
@@ -51,6 +53,7 @@ public class AuthServiceImp implements AuthService {
         Set<Role> roles = new HashSet<>();
         Role role = roleRepository.findByRoleName(Role.RoleName.valueOf("USER"));
         roles.add(role);
+
         User user = User.builder()
                 .username(request.getUsername())
                 .password(new BCryptPasswordEncoder().encode(request.getPassword()))
