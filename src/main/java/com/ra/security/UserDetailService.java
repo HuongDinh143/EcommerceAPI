@@ -22,7 +22,7 @@ public class UserDetailService implements UserDetailsService {
         UserPrinciple userPrinciple = new UserPrinciple();
         userPrinciple.setUser(user);
         userPrinciple.setAuthorities(user.getRoles().stream().map(
-                        role -> new SimpleGrantedAuthority("ROLE_" + role.getRoleName().name()))
+                        role -> new SimpleGrantedAuthority("ROLE_" + role.getRoleName()))
                 .collect(Collectors.toSet())
 
         );
