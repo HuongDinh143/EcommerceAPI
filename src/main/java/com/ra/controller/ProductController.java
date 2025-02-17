@@ -32,22 +32,45 @@ public class ProductController {
         Page<ProductResponseDto> responseDtos = productService.pagination(pageable);
         return new ResponseEntity<>(responseDtos, HttpStatus.OK);
     }
+
     @GetMapping("/search/{searchValue}")
     public ResponseEntity<List<ProductResponseDto>> searchProducts(
             @PathVariable String searchValue) {
         List<ProductResponseDto> listResult = productService.search(searchValue);
         return new ResponseEntity<>(listResult, HttpStatus.OK);
     }
+
     @GetMapping("/featured-products")
     public ResponseEntity<List<ProductResponseDto>> getFeaturedProducts() {
         List<ProductResponseDto> featuredProducts = productService.getFeaturedProducts();
         return new ResponseEntity<>(featuredProducts, HttpStatus.OK);
     }
+
     @GetMapping("/bestSale")
     public ResponseEntity<List<ProductResponseDto>> getBestSale() {
         List<ProductResponseDto> bestSaleProducts = productService.getTop10SaleProducts();
         return new ResponseEntity<>(bestSaleProducts, HttpStatus.OK);
     }
+
+    @GetMapping("/new-products")
+    public ResponseEntity<List<ProductResponseDto>> getNewProducts() {
+        List<ProductResponseDto> newProducts = productService.getNewProduct();
+        return new ResponseEntity<>(newProducts, HttpStatus.OK);
+    }
+
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<List<ProductResponseDto>> getProductsByCategoryId(@PathVariable Long categoryId
+    ) throws Exception {
+        List<ProductResponseDto> products = productService.getProductByCategory(categoryId);
+        return new ResponseEntity<>(products, HttpStatus.OK);
+    }
+
+    @GetMapping("/{productId}")
+    public ResponseEntity<ProductResponseDto> getProductById(@PathVariable Long productId) throws Exception {
+        ProductResponseDto product = productService.getProductById(productId);
+        return new ResponseEntity<>(product, HttpStatus.OK);
+    }
+
 
 
 }

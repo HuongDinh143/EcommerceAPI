@@ -11,5 +11,7 @@ public interface ProductService {
     List<ProductResponseDto> search(String searchValue);
     List<ProductResponseDto> getFeaturedProducts();
     List<ProductResponseDto> getTop10SaleProducts();
-    List<ProductResponseDto> getTop10ProductNew();
+    List<ProductResponseDto> getNewProduct();
+    List<ProductResponseDto> getProductByCategory(Long categoryId) throws Exception;
+    ProductResponseDto getProductById(Long productId) throws Exception;
 }
