@@ -1,4 +1,4 @@
-package com.ra.service;
+package com.ra.service.auth;
 
 import com.ra.model.dto.*;
 import com.ra.model.entity.Role;
@@ -7,6 +7,7 @@ import com.ra.repository.RoleRepository;
 import com.ra.repository.UserRepository;
 import com.ra.security.UserPrinciple;
 import com.ra.security.jwt.JwtProvider;
+import com.ra.service.UploadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthServiceImp implements AuthService {
@@ -49,7 +51,7 @@ public class AuthServiceImp implements AuthService {
     }
 
     @Override
-    public UserSignUpResponseDto register(UserSignUpRequestDto request) {
+    public UserResponseDto register(UserSignUpRequestDto request) {
         Set<Role> roles = new HashSet<>();
         Role role = roleRepository.findByRoleName(Role.RoleName.valueOf("USER"));
         roles.add(role);
@@ -71,21 +73,44 @@ public class AuthServiceImp implements AuthService {
     }
 
     @Override
-    public UserSignUpResponseDto updatePermission(UserPermissionDto request, Long userId) throws Exception {
-        User user = userRepository.findById(userId).orElseThrow(()->new Exception("User not found"));
-        Set<Role> roles = new HashSet<>();
+    public UserResponseDto updatePermission(UserPermissionDto request, Long userId) throws Exception {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new Exception("User not found"));
+
+        Set<Role> currentRoles = user.getRoles();
+
         for (String roleName : request.getRoleName()) {
             Role role = roleRepository.findByRoleName(Role.RoleName.valueOf(roleName));
-            roles.add(role);
+            currentRoles.add(role);
         }
-        user.setRoles(roles);
-        User userUpdate = userRepository.save(user);
 
-        return toDto(userUpdate);
+        user.setRoles(currentRoles);
+        User updatedUser = userRepository.save(user);
+
+        return toDto(updatedUser);
     }
 
-    private UserSignUpResponseDto toDto(User user) {
-        return UserSignUpResponseDto.builder()
+    @Override
+    public UserResponseDto removePermission(UserPermissionDto request, Long userId) throws Exception {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new Exception("User not found"));
+
+        Set<Role> currentRoles = user.getRoles();
+
+        for (String roleName : request.getRoleName()) {
+            Role role = roleRepository.findByRoleName(Role.RoleName.valueOf(roleName));
+            currentRoles.remove(role);
+        }
+
+        user.setRoles(currentRoles);
+        User updatedUser = userRepository.save(user);
+
+        return toDto(updatedUser);
+    }
+
+
+    private UserResponseDto toDto(User user) {
+        return UserResponseDto.builder()
                 .username(user.getUsername())
                 .fullName(user.getFullName())
                 .phone(user.getPhone())

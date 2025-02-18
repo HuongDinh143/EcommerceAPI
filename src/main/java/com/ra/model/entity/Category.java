@@ -2,7 +2,6 @@ package com.ra.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +24,7 @@ public class Category {
     @Column(name = "status")
     private Boolean status;
     @OneToMany(mappedBy = "category")
+    @Builder.Default
     private List<Product> products = new ArrayList<>();
 
 }

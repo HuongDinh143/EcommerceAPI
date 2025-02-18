@@ -18,15 +18,16 @@ public class UserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+
         UserPrinciple userPrinciple = new UserPrinciple();
         userPrinciple.setUser(user);
-        userPrinciple.setAuthorities(user.getRoles().stream().map(
-                        role -> new SimpleGrantedAuthority("ROLE_" + role.getRoleName()))
-                .collect(Collectors.toSet())
-
-        );
+        userPrinciple.setAuthorities(user.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getRoleName().name()))
+                .collect(Collectors.toSet()));
 
         return userPrinciple;
     }
+
 }

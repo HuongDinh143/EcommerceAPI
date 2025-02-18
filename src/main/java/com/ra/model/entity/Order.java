@@ -4,9 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "orders")
@@ -20,7 +18,7 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "serial_number",length = 100)
-    private String serialNumber = UUID.randomUUID().toString();
+    private String serialNumber;
     @ManyToOne
     @JoinColumn(name = "user_id",referencedColumnName = "id")
     private User user;
@@ -45,12 +43,14 @@ public class Order {
     @Column(name = "received_at")
     private LocalDate receivedAt;
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<OrderDetail> orderDetails = new HashSet<>();
+    @Builder.Default
+    private List<OrderDetail> orderDetails = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {
         this.receivedAt = createdAt.plusDays(4);
     }
+
 
 
 }

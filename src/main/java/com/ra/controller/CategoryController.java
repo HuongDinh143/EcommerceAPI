@@ -1,5 +1,6 @@
 package com.ra.controller;
 
+import com.ra.model.dto.CategoryResponseDto;
 import com.ra.model.entity.Category;
 import com.ra.service.category.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ public class CategoryController {
     private CategoryService categoryService;
     @GetMapping
     public ResponseEntity<?> findAll() {
-        List<Category> categories = categoryService.findAll();
+        List<CategoryResponseDto> categories = categoryService.findAll();
         return new ResponseEntity<>(categories, HttpStatus.OK);
     }
 }

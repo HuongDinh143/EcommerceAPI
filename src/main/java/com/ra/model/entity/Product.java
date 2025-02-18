@@ -20,7 +20,8 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "sku")
-    private String sku = UUID.randomUUID().toString();
+    private String sku ;
+
     @Column(name = "product_name")
     
     private String productName;
@@ -40,10 +41,11 @@ public class Product {
     @JoinColumn(name = "cat_id",referencedColumnName = "id")
     private Category category;
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
     private Set<OrderDetail> orderDetails = new HashSet<>();
+
     @OneToMany(mappedBy = "product",cascade = CascadeType.ALL,orphanRemoval = true,fetch = FetchType.LAZY)
-    private Set<ShoppingCart> shoppingCarts = new HashSet<>();
-    @OneToMany(mappedBy = "product",cascade = CascadeType.ALL,orphanRemoval = true,fetch = FetchType.LAZY)
+    @Builder.Default
     private Set<WishList> wishLists = new HashSet<>();
 
 }

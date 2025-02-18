@@ -1,26 +1,28 @@
 package com.ra.model.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
+@Table(name = "shopping_cart")
 @Getter
 @Setter
-@Builder
 public class ShoppingCart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
-    @JoinColumn(name = "product_id",referencedColumnName = "id",nullable = false)
-    private Product product;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id",referencedColumnName = "id",nullable = false)
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "order_quantity")
-    private int orderQuantity;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "cart_id")
+    private List<CartItem> items = new ArrayList<>();
 }
+

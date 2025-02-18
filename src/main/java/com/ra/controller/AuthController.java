@@ -3,8 +3,8 @@ package com.ra.controller;
 import com.ra.model.dto.UserSignInRequestDto;
 import com.ra.model.dto.UserSignInResponse;
 import com.ra.model.dto.UserSignUpRequestDto;
-import com.ra.model.dto.UserSignUpResponseDto;
-import com.ra.service.AuthService;
+import com.ra.model.dto.UserResponseDto;
+import com.ra.service.auth.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +22,7 @@ public class AuthController {
     }
     @PostMapping("/sign-up")
     public ResponseEntity<?> signUp(@RequestBody UserSignUpRequestDto requestDto) {
-        UserSignUpResponseDto userSignUpResponseDto = authService.register(requestDto);
+        UserResponseDto userSignUpResponseDto = authService.register(requestDto);
         return new ResponseEntity<>(userSignUpResponseDto, HttpStatus.OK);
     }
 
