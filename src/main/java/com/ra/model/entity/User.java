@@ -62,6 +62,10 @@ public class User {
     @Builder.Default
     private Set<WishList> wishLists = new HashSet<>();
 
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
+    @Builder.Default
+    private Set<CartItem> cartItems = new HashSet<>();
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDate.now();

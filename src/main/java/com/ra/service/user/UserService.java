@@ -1,6 +1,6 @@
 package com.ra.service.user;
 
-import com.ra.model.dto.UserResponseDto;
+import com.ra.model.dto.response.UserResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

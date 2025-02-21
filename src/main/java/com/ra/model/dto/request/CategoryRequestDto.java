@@ -1,5 +1,4 @@
-package com.ra.model.dto;
-
+package com.ra.model.dto.request;
 
 import lombok.*;
 
@@ -8,8 +7,7 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-public class CategoryResponseDto {
-    private Long id;
+public class CategoryRequestDto {
     private String catName;
     private String catDesc;
     private Boolean status;

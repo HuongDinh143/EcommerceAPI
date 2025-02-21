@@ -1,6 +1,6 @@
 package com.ra.controller;
 
-import com.ra.model.dto.ProductResponseDto;
+import com.ra.model.dto.response.ProductResponseDto;
 import com.ra.service.product.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

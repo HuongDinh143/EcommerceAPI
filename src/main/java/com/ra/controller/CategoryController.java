@@ -1,7 +1,6 @@
 package com.ra.controller;
 
-import com.ra.model.dto.CategoryResponseDto;
-import com.ra.model.entity.Category;
+import com.ra.model.dto.response.CategoryResponseDto;
 import com.ra.service.category.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

@@ -1,23 +1,25 @@
-package com.ra.model.dto;
+package com.ra.model.dto.response;
 
 import com.ra.model.entity.Role;
 import lombok.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
 @Setter
+@Getter
 @Builder
-public class UserSignUpRequestDto {
+public class UserResponseDto {
+    private Long id;
     private String username;
-    private String password;
     private String email;
     private String fullName;
     private String phone;
     private String address;
     private LocalDate createdAt;
+    private Set<Role> roles;
+
+
 }

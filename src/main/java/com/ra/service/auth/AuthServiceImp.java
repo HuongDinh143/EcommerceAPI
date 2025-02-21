@@ -1,8 +1,17 @@
 package com.ra.service.auth;
 
+import com.ra.exception.CustomException;
 import com.ra.model.dto.*;
+import com.ra.model.dto.request.UserSignInRequestDto;
+import com.ra.model.dto.request.UserSignUpRequestDto;
+import com.ra.model.dto.response.RevenueByCategoryDto;
+import com.ra.model.dto.response.UserResponseDto;
+import com.ra.model.dto.response.UserSignInResponse;
+import com.ra.model.entity.Category;
+import com.ra.model.entity.Order;
 import com.ra.model.entity.Role;
 import com.ra.model.entity.User;
+import com.ra.repository.OrderRepository;
 import com.ra.repository.RoleRepository;
 import com.ra.repository.UserRepository;
 import com.ra.security.UserPrinciple;
@@ -17,6 +26,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -32,6 +43,8 @@ public class AuthServiceImp implements AuthService {
     private UserRepository userRepository;
     @Autowired
     private UploadService uploadService;
+    @Autowired
+    private OrderRepository orderRepository;
     @Override
     public UserSignInResponse login(UserSignInRequestDto request) {
         Authentication authentication;
@@ -75,7 +88,7 @@ public class AuthServiceImp implements AuthService {
     @Override
     public UserResponseDto updatePermission(UserPermissionDto request, Long userId) throws Exception {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new Exception("User not found"));
+                .orElseThrow(() -> new CustomException("User not found"));
 
         Set<Role> currentRoles = user.getRoles();
 
@@ -93,7 +106,7 @@ public class AuthServiceImp implements AuthService {
     @Override
     public UserResponseDto removePermission(UserPermissionDto request, Long userId) throws Exception {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new Exception("User not found"));
+                .orElseThrow(() -> new CustomException("User not found"));
 
         Set<Role> currentRoles = user.getRoles();
 
@@ -107,6 +120,9 @@ public class AuthServiceImp implements AuthService {
 
         return toDto(updatedUser);
     }
+
+
+
 
 
     private UserResponseDto toDto(User user) {

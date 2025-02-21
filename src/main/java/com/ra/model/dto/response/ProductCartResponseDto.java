@@ -1,4 +1,4 @@
-package com.ra.model.dto;
+package com.ra.model.dto.response;
 
 import lombok.*;
 
@@ -12,6 +12,6 @@ public class ProductCartResponseDto {
     private String name;
     private String description;
     private double price;
-    private int quantity;
+    private Long quantity;
     private double totalPrice;
 }

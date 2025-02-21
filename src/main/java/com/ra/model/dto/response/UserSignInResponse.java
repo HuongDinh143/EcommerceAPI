@@ -1,4 +1,4 @@
-package com.ra.model.dto;
+package com.ra.model.dto.response;
 
 import com.ra.model.entity.Role;
 import lombok.*;

@@ -1,6 +1,6 @@
 package com.ra.service.user;
 
-import com.ra.model.dto.UserResponseDto;
+import com.ra.model.dto.response.UserResponseDto;
 import com.ra.model.entity.User;
 import com.ra.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

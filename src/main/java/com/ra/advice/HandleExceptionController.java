@@ -23,7 +23,7 @@ public class HandleExceptionController {
     }
     @ExceptionHandler(CustomException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public DataError<?> handlerValidExceptionNotFoundData(CustomException exception){
+    public DataError<?> handlerExceptionNotFoundData(CustomException exception){
         return  new DataError<>(404,exception.getMessage());
     }
 }

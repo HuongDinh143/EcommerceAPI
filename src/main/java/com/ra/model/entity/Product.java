@@ -21,16 +21,14 @@ public class Product {
     private Long id;
     @Column(name = "sku")
     private String sku ;
-
     @Column(name = "product_name")
-    
     private String productName;
     @Column(name = "description")
     private String description;
     @Column(name = "unit_price")
     private Double unitPrice;
     @Column(name = "stock_quantity")
-    private int stockQuantity;
+    private Long stockQuantity;
     @Column(name = "image")
     private String image;
     private LocalDate createdAt;
@@ -47,5 +45,9 @@ public class Product {
     @OneToMany(mappedBy = "product",cascade = CascadeType.ALL,orphanRemoval = true,fetch = FetchType.LAZY)
     @Builder.Default
     private Set<WishList> wishLists = new HashSet<>();
+
+    @OneToMany(mappedBy = "product",cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
+    @Builder.Default
+    private Set<CartItem> cartItems = new HashSet<>();
 
 }

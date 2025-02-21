@@ -1,6 +1,5 @@
-package com.ra.model.dto;
+package com.ra.model.dto.response;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -15,8 +14,9 @@ public class ProductResponseDto {
     private String productName;
     private String description;
     private Double unitPrice;
-    private int stockQuantity;
+    private Long stockQuantity;
     private String image;
+    private String catName;
     private LocalDate createdAt;
     private LocalDate updatedAt;
 }

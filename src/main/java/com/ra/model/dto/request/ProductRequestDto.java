@@ -1,25 +1,24 @@
-package com.ra.model.dto;
+package com.ra.model.dto.request;
 
 import com.ra.validate.ProductUnique;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
-
-import java.time.LocalDate;
+import org.springframework.web.multipart.MultipartFile;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Builder
-public class ProductCreateRequestDto {
+public class ProductRequestDto {
     private String sku;
     @NotBlank
     @ProductUnique(message = "Tên sản phẩm đã tồn tại")
     private String productName;
     private String description;
     private Double unitPrice;
-    private int stockQuantity;
-    private String image;
-    private LocalDate createdAt;
-    private LocalDate updatedAt;
+    private Long stockQuantity;
+    private MultipartFile image;
+    private Long catId;
+    private Boolean isFeatured;
 }

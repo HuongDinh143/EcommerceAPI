@@ -1,4 +1,4 @@
-package com.ra.model.dto;
+package com.ra.model.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;

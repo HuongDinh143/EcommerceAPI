@@ -1,7 +1,8 @@
 package com.ra.service.product;
 
-import com.ra.model.dto.ProductCartResponseDto;
-import com.ra.model.dto.ProductResponseDto;
+import com.ra.model.dto.response.ProductCartResponseDto;
+import com.ra.model.dto.request.ProductRequestDto;
+import com.ra.model.dto.response.ProductResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -16,4 +17,7 @@ public interface ProductService {
     List<ProductResponseDto> getProductByCategory(Long categoryId) throws Exception;
     ProductResponseDto getProductById(Long productId) throws Exception;
     List<ProductCartResponseDto> getProductsInCart(Long userId);
+    ProductResponseDto addNewProduct(ProductRequestDto requestDto);
+    ProductResponseDto updateProduct(Long productId, ProductRequestDto requestDto);
+    void deleteProduct(Long productId);
 }
