@@ -24,11 +24,15 @@ public class OrderDetail {
     private Product product;
 
     @Column(name = "name", length = 100, nullable = false)
-    private String name;
+    private String productName;
 
     @Column(name = "unit_price", nullable = false)
     private Double unitPrice;
 
     @Column(name = "order_quantity", nullable = false)
     private Long orderQuantity;
+
+    public void getProductName(String productName) {
+        this.productName = productName;
+    }
 }

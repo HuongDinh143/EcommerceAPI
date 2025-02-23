@@ -32,7 +32,7 @@ public class ReportServiceImp implements ReportService {
         Map<Long,BestSellerProductDto> productSalesMap = new HashMap<>();
         for (OrderDetail od : orderDetails) {
             Long productId = od.getProduct().getId();
-            String productName = od.getName();
+            String productName = od.getProductName();
             Long quantity = od.getOrderQuantity();
             productSalesMap.putIfAbsent(productId, new BestSellerProductDto(productId, productName, 0L));
             productSalesMap.get(productId).setTotalSold(productSalesMap.get(productId).getTotalSold() + quantity);
@@ -62,15 +62,13 @@ public class ReportServiceImp implements ReportService {
     public List<RevenueByCategoryDto> getRevenueByCategory(LocalDate from, LocalDate to) {
         List<Order> orders = orderRepository.findByCreatedAtBetween(from, to);
 
-        // Duyệt từng order, nhóm theo category và tính tổng doanh thu
         Map<Category, Double> revenueByCategory = orders.stream()
-                .flatMap(order -> order.getOrderDetails().stream()) // Lấy từng OrderItem trong Order
+                .flatMap(order -> order.getOrderDetails().stream())
                 .collect(Collectors.groupingBy(
-                        orderDetail -> orderDetail.getProduct().getCategory(), // Nhóm theo danh mục sản phẩm
+                        orderDetail -> orderDetail.getProduct().getCategory(),
                         Collectors.summingDouble(orderDetail -> orderDetail.getOrderQuantity() * orderDetail.getProduct().getUnitPrice()) // Tính tổng doanh thu
                 ));
 
-        // Chuyển dữ liệu sang DTO
         return revenueByCategory.entrySet().stream()
                 .map(entry -> new RevenueByCategoryDto(entry.getKey().getId(), entry.getKey().getCatName(), entry.getValue()))
                 .collect(Collectors.toList());
@@ -89,7 +87,7 @@ public class ReportServiceImp implements ReportService {
 
         }
         return userMap.values().stream()
-                .sorted((a, b) -> Double.compare(b.getTotalPrice(), a.getTotalPrice())) // Sắp xếp giảm dần
+                .sorted((a, b) -> Double.compare(b.getTotalPrice(), a.getTotalPrice()))
                 .limit(10)
                 .collect(Collectors.toList());
     }

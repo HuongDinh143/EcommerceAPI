@@ -1,5 +1,6 @@
 package com.ra.model.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 @AllArgsConstructor
@@ -7,6 +8,7 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class WishListResponseDto {
     private Long productId;
     private String productName;

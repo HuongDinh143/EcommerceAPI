@@ -88,7 +88,7 @@ public class AuthServiceImp implements AuthService {
     @Override
     public UserResponseDto updatePermission(UserPermissionDto request, Long userId) throws Exception {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException("User not found"));
+                .orElseThrow(() -> new CustomException("Không tìm thấy người dùng"));
 
         Set<Role> currentRoles = user.getRoles();
 
@@ -106,7 +106,7 @@ public class AuthServiceImp implements AuthService {
     @Override
     public UserResponseDto removePermission(UserPermissionDto request, Long userId) throws Exception {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException("User not found"));
+                .orElseThrow(() -> new CustomException("Không tìm thấy người dùng"));
 
         Set<Role> currentRoles = user.getRoles();
 

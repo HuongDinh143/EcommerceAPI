@@ -1,14 +1,9 @@
 package com.ra.model.dto.response;
 
-import com.ra.model.entity.Order;
-import com.ra.model.entity.OrderDetail;
-import com.ra.model.entity.User;
-import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+
 
 @AllArgsConstructor
 @NoArgsConstructor

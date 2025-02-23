@@ -3,7 +3,7 @@ package com.ra.security;
 import com.ra.security.jwt.CustomAccessDeniedHandler;
 import com.ra.security.jwt.JwtAuthTokenFilter;
 import com.ra.security.jwt.JwtEntrypoint;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -17,32 +17,43 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    @Autowired
-    private UserDetailsService userDetailsService;
-    @Autowired
-    private JwtAuthTokenFilter jwtAuthTokenFilter;
-    @Autowired
-    private CustomAccessDeniedHandler customAccessDeniedHandler;
-    @Autowired
-    private JwtEntrypoint jwtEntrypoint;
+
+    private final UserDetailsService userDetailsService;
+    private final JwtAuthTokenFilter jwtAuthTokenFilter;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final JwtEntrypoint jwtEntrypoint;
+
+    public SecurityConfig(UserDetailsService userDetailsService,
+                          JwtAuthTokenFilter jwtAuthTokenFilter,
+                          CustomAccessDeniedHandler customAccessDeniedHandler,
+                          JwtEntrypoint jwtEntrypoint) {
+        this.userDetailsService = userDetailsService;
+        this.jwtAuthTokenFilter = jwtAuthTokenFilter;
+        this.customAccessDeniedHandler = customAccessDeniedHandler;
+        this.jwtEntrypoint = jwtEntrypoint;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        return httpSecurity.csrf(AbstractHttpConfigurer::disable)
-                .authenticationProvider(authenticationProvider())
-                .authorizeHttpRequests(auth->{
-                    auth
-                            .requestMatchers("/api/v1/admin/**").hasAnyAuthority("ROLE_ADMIN")
-                            .requestMatchers("/api/v1/user", "/api/v1/user/cart/**").hasAnyAuthority("ROLE_USER")
-                            .requestMatchers("/api/v1/home", "/api/v1/auth/**").permitAll()
-                            .requestMatchers("/api/v1/products/**","api/v1/categories/**").permitAll()
-                            .anyRequest().authenticated();
-                }).sessionManagement(auth->auth.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).
-                exceptionHandling(auth->auth.authenticationEntryPoint(jwtEntrypoint).accessDeniedHandler(customAccessDeniedHandler)).
-                addFilterAfter(jwtAuthTokenFilter, UsernamePasswordAuthenticationFilter.class)
+        return httpSecurity
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> {
+                    auth.requestMatchers("/api/v1/admin/**").hasAuthority("ROLE_ADMIN");
+                    auth.requestMatchers("/api/v1/user", "/api/v1/user//**").hasAuthority("ROLE_USER");
+                    auth.requestMatchers("/api/v1/home", "/api/v1/auth/**").permitAll();
+                    auth.requestMatchers("/api/v1/products/**", "/api/v1/categories/**").permitAll();
+                    auth.anyRequest().authenticated();
+                })
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(jwtEntrypoint)
+                        .accessDeniedHandler(customAccessDeniedHandler))
+                .addFilterAfter(jwtAuthTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
@@ -53,6 +64,7 @@ public class SecurityConfig {
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

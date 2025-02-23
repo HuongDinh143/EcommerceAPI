@@ -1,6 +1,7 @@
 package com.ra.advice;
 
 import com.ra.exception.CustomException;
+import com.ra.exception.OrderStatusException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,4 +27,10 @@ public class HandleExceptionController {
     public DataError<?> handlerExceptionNotFoundData(CustomException exception){
         return  new DataError<>(404,exception.getMessage());
     }
+    @ExceptionHandler(OrderStatusException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public DataError<?> handlerOrderStatusException(OrderStatusException exception){
+        return  new DataError<>(500,exception.getMessage());
+    }
+
 }
