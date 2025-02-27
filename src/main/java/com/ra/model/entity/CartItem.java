@@ -17,6 +17,10 @@ public class CartItem {
     private User user;
 
     @ManyToOne
+    @JoinColumn(name = "cart_id", nullable = false)
+    private ShoppingCart shoppingCart;
+
+    @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id", nullable = false)
     private Product product;
 

@@ -46,7 +46,7 @@ public class ProductController {
         return new ResponseEntity<>(featuredProducts, HttpStatus.OK);
     }
 
-    @GetMapping("/bestSale")
+    @GetMapping("/best-seller-products")
     public ResponseEntity<List<ProductResponseDto>> getBestSale() {
         List<ProductResponseDto> bestSaleProducts = productService.getTop10SaleProducts();
         return new ResponseEntity<>(bestSaleProducts, HttpStatus.OK);
@@ -58,7 +58,7 @@ public class ProductController {
         return new ResponseEntity<>(newProducts, HttpStatus.OK);
     }
 
-    @GetMapping("/category/{categoryId}")
+    @GetMapping("/categories/{categoryId}")
     public ResponseEntity<List<ProductResponseDto>> getProductsByCategoryId(@PathVariable Long categoryId
     ) throws Exception {
         List<ProductResponseDto> products = productService.getProductByCategory(categoryId);

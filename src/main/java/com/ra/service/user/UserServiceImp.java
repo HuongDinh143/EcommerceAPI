@@ -33,21 +33,20 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public void updateStatusUser(Long userId) throws Exception {
-        User user = userRepository.findById(userId).orElseThrow(()->new Exception("User not found"));
+    public UserResponseDto updateStatusUser(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(()->new CustomException("User not found"));
         user.setStatus(!user.getStatus());
         userRepository.save(user);
+        return toDto(user);
     }
 
     @Override
-    public UserResponseDto findByName(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
-        if (user == null) {
+    public List<UserResponseDto> findByName(String username) {
+        List<User> users = userRepository.findByUsernameContaining(username);
+        if (users == null) {
             return null;
         }
-        return toDto(user);
-
+        return users.stream().map(this::toDto).toList();
     }
 
     @Override
@@ -126,7 +125,10 @@ public class UserServiceImp implements UserService {
                 .email(user.getEmail())
                 .phone(user.getPhone())
                 .address(user.getAddress())
+                .status(user.getStatus())
                 .roles(user.getRoles())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
                 .build();
     }
 }

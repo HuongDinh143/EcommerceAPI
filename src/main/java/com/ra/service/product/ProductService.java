@@ -15,7 +15,7 @@ public interface ProductService {
     List<ProductResponseDto> getTop10SaleProducts();
     List<ProductResponseDto> getNewProduct();
     List<ProductResponseDto> getProductByCategory(Long categoryId) throws Exception;
-    ProductResponseDto getProductById(Long productId) throws Exception;
+    ProductResponseDto getProductById(Long productId);
     List<ProductCartResponseDto> getProductsInCart(Long userId);
     ProductResponseDto addNewProduct(ProductRequestDto requestDto);
     ProductResponseDto updateProduct(Long productId, ProductRequestDto requestDto);

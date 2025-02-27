@@ -1,6 +1,7 @@
 package com.ra.service.order;
 
 import com.ra.exception.CustomException;
+import com.ra.exception.OrderCheckException;
 import com.ra.exception.OrderStatusException;
 import com.ra.model.dto.request.OrderRequestDto;
 import com.ra.model.dto.response.OrderDetailResponseDto;
@@ -8,21 +9,25 @@ import com.ra.model.dto.response.OrderHistoryResponseDto;
 import com.ra.model.dto.response.OrderResponseDto;
 import com.ra.model.entity.Order;
 import com.ra.model.entity.OrderDetail;
+import com.ra.model.entity.Product;
 import com.ra.repository.OrderRepository;
+import com.ra.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImp implements OrderService {
     @Autowired
     private OrderRepository orderRepository;
+    @Autowired
+    private ProductRepository productRepository;
 
     @Override
     public List<OrderResponseDto> getAllOrders() {
@@ -39,26 +44,82 @@ public class OrderServiceImp implements OrderService {
     @Override
     public OrderResponseDto findById(Long id) {
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new CustomException("Order not found"));
+                .orElseThrow(() -> new CustomException("Không tìm thấy đơn hàng"));
         return toDto(order);
 
     }
 
-
     @Override
     public OrderResponseDto updateOrderStatus(Long id, OrderRequestDto requestDto) {
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new CustomException("Order not found"));
+                .orElseThrow(() -> new CustomException("Không tìm thấy đơn hàng"));
+
+        Order.Status currentStatus = order.getStatus();
+        Order.Status newStatus;
 
         try {
-            Order.Status newStatus = Order.Status.valueOf(requestDto.getStatus().toUpperCase());
-            order.setStatus(newStatus);
-            orderRepository.save(order);
+            newStatus = Order.Status.valueOf(requestDto.getStatus().toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new OrderStatusException("Invalid order status: " + requestDto.getStatus());
+            throw new OrderStatusException("Trạng thái không hợp lệ: " + requestDto.getStatus());
         }
 
+        if (newStatus == Order.Status.CANCEL && currentStatus != Order.Status.WAITING && currentStatus != Order.Status.CONFIRM) {
+            throw new OrderStatusException(
+                    "Chỉ có thể hủy khi đơn còn ở trạng thái đợi");
+        }
+
+        if (!isValidStatusTransition(currentStatus, newStatus)) {
+            throw new OrderStatusException("Chuyển đổi không hợp lệ từ " + currentStatus + " to " + newStatus);
+        }
+
+
+        if (newStatus == Order.Status.SUCCESS) {
+            updateProductTotalSold(order);
+        }
+
+        if (newStatus == Order.Status.CANCEL) {
+            restoreStock(order);
+        }
+
+        order.setStatus(newStatus);
+        orderRepository.save(order);
+
         return toDto(order);
+    }
+
+
+    /**
+     * Cập nhật tổng số lượng sản phẩm đã bán khi đơn hàng SUCCESS
+     */
+    private void updateProductTotalSold(Order order) {
+        for (OrderDetail item : order.getOrderDetails()) {
+            Product product = item.getProduct();
+            product.setTotalSold(product.getTotalSold() + item.getOrderQuantity());
+            productRepository.save(product);
+        }
+    }
+
+    /**
+     * Hoàn lại số lượng tồn kho khi đơn hàng bị CANCEL
+     */
+    private void restoreStock(Order order) {
+        for (OrderDetail item : order.getOrderDetails()) {
+            Product product = item.getProduct();
+            product.setStockQuantity(product.getStockQuantity() + item.getOrderQuantity());
+            productRepository.save(product);
+        }
+    }
+
+    /**
+     * Kiểm tra trạng thái hợp lệ (chỉ cho phép tiến về phía trước)
+     */
+    private boolean isValidStatusTransition(Order.Status currentStatus, Order.Status newStatus) {
+        return switch (currentStatus) {
+            case WAITING -> newStatus == Order.Status.CONFIRM || newStatus == Order.Status.CANCEL;
+            case CONFIRM -> newStatus == Order.Status.DELIVERY;
+            case DELIVERY -> newStatus == Order.Status.SUCCESS;
+            case SUCCESS, CANCEL -> false; // Không thể cập nhật từ SUCCESS hoặc CANCEL
+        };
     }
 
     @Override
@@ -77,14 +138,13 @@ public class OrderServiceImp implements OrderService {
 
     @Override
     public List<OrderDetailResponseDto> getOrderDetailBySerialNumber(String serialNumber, Long userId) {
-        return orderRepository.findByUserId(userId).stream()
-                .filter(order -> serialNumber.equals(order.getSerialNumber()))
-                .findFirst()
+        return orderRepository.findBySerialNumberAndUserId(serialNumber, userId)
                 .map(order -> order.getOrderDetails().stream()
                         .map(this::toOrderDetailDto)
                         .toList())
                 .orElse(Collections.emptyList());
     }
+
 
     @Override
     public List<OrderHistoryResponseDto> getOrderHistoryByStatus(String status, Long userId) {
@@ -96,10 +156,12 @@ public class OrderServiceImp implements OrderService {
 
     @Override
     public void cancelOrderByStatusWaiting(Long orderId, Long userId) {
-        Order order = orderRepository.findByIdAndUserId(orderId,userId);
-        if (order!=null && order.getStatus().equals(Order.Status.WAITING)) {
+        Order order = orderRepository.findByIdAndUserId(orderId, userId);
+        if (order != null && order.getStatus().equals(Order.Status.WAITING)) {
             order.setStatus(Order.Status.CANCEL);
             orderRepository.save(order);
+        } else if (order != null && order.getStatus().equals(Order.Status.CANCEL)) {
+            throw new CustomException("Đơn hàng đã hủy");
         }else {
             throw new CustomException("Không thể hủy đơn hàng");
         }

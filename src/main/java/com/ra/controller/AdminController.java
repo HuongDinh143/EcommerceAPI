@@ -2,10 +2,12 @@ package com.ra.controller;
 
 import com.ra.model.dto.*;
 import com.ra.model.dto.request.CategoryRequestDto;
+import com.ra.model.dto.request.CategoryUpdateRequestDto;
 import com.ra.model.dto.request.OrderRequestDto;
 import com.ra.model.dto.request.ProductRequestDto;
 import com.ra.model.dto.response.*;
 import com.ra.model.entity.Role;
+import com.ra.model.entity.User;
 import com.ra.service.auth.AuthService;
 import com.ra.service.category.CategoryService;
 import com.ra.service.order.OrderService;
@@ -58,21 +60,27 @@ public class AdminController {
 
     }
     @PatchMapping("users/{id}")
-    public ResponseEntity<?> updatePermissionUser(@RequestBody @Valid UserPermissionDto userPermissionDTO, @PathVariable String id) throws Exception {
+    public ResponseEntity<?> updatePermissionUser(@RequestBody @Valid UserPermissionDto userPermissionDTO, @PathVariable String id) {
         UserResponseDto userResponseDto = authService.updatePermission(userPermissionDTO, Long.valueOf(id));
         return new ResponseEntity<>(userResponseDto, HttpStatus.OK);
     }
     @PatchMapping("/users/{id}/remove-role")
     public ResponseEntity<?> removePermissionUser(
             @RequestBody @Valid UserPermissionDto userPermissionDTO,
-            @PathVariable Long id) throws Exception {
+            @PathVariable Long id) {
 
         UserResponseDto userResponseDto = authService.removePermission(userPermissionDTO, id);
         return new ResponseEntity<>(userResponseDto, HttpStatus.OK);
     }
     @PutMapping("/users/{userId}")
-    public void updateStatusUser(@PathVariable Long userId) throws Exception {
-        userService.updateStatusUser(userId);
+    public ResponseEntity<?> updateStatusUser(@PathVariable Long userId) {
+        UserResponseDto userResponseDto= userService.updateStatusUser(userId);
+        if (userResponseDto.getStatus()){
+            return ResponseEntity.ok("Mở khóa thành công");
+        }else{
+            return ResponseEntity.ok("Khóa thành công");
+        }
+
     }
     @GetMapping("/roles")
     public ResponseEntity<?> getAllRoles(){
@@ -80,9 +88,9 @@ public class AdminController {
         return new ResponseEntity<>(roles, HttpStatus.OK);
     }
     @GetMapping("/users/{search}")
-    public ResponseEntity<UserResponseDto> searchUsers( @PathVariable String search) {
-        UserResponseDto user = userService.findByName(search);
-        return new ResponseEntity<>(user, HttpStatus.OK);
+    public ResponseEntity<List<UserResponseDto>> searchUsers( @PathVariable String search) {
+        List<UserResponseDto> users = userService.findByName(search);
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
     @GetMapping("/products")
     public ResponseEntity<Page<ProductResponseDto>> getAllProducts(
@@ -99,7 +107,7 @@ public class AdminController {
         return new ResponseEntity<>(responseDtos, HttpStatus.OK);
     }
     @GetMapping("/products/{id}")
-    public ResponseEntity<ProductResponseDto> getProductById(@PathVariable Long id) throws Exception {
+    public ResponseEntity<ProductResponseDto> getProductById(@PathVariable Long id) {
         ProductResponseDto product = productService.getProductById(id);
         return new ResponseEntity<>(product, HttpStatus.OK);
     }
@@ -114,8 +122,9 @@ public class AdminController {
         return new ResponseEntity<>(productResponseDto, HttpStatus.OK);
     }
     @DeleteMapping("/products/{id}")
-    public void deleteProduct(@PathVariable Long id){
+    public ResponseEntity<?> deleteProduct(@PathVariable Long id){
         productService.deleteProduct(id);
+        return ResponseEntity.ok("Xóa sản phẩm thành công");
     }
     @GetMapping("/categories")
     public ResponseEntity<Page<CategoryResponseDto>> getAllCategories(
@@ -135,12 +144,12 @@ public class AdminController {
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
     @PostMapping("/categories")
-    public ResponseEntity<CategoryResponseDto> create(@RequestBody CategoryRequestDto requestDto){
+    public ResponseEntity<CategoryResponseDto> create(@Valid @RequestBody CategoryRequestDto requestDto){
         CategoryResponseDto responseDto = categoryService.create(requestDto);
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
     @PutMapping("/categories/{id}")
-    public ResponseEntity<CategoryResponseDto> update(@PathVariable Long id,@RequestBody CategoryRequestDto requestDto){
+    public ResponseEntity<CategoryResponseDto> update(@PathVariable Long id,@RequestBody CategoryUpdateRequestDto requestDto){
         CategoryResponseDto responseDto = categoryService.update(id,requestDto);
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }

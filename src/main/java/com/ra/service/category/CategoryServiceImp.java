@@ -2,6 +2,7 @@ package com.ra.service.category;
 
 import com.ra.exception.CustomException;
 import com.ra.model.dto.request.CategoryRequestDto;
+import com.ra.model.dto.request.CategoryUpdateRequestDto;
 import com.ra.model.dto.response.CategoryResponseDto;
 import com.ra.model.entity.Category;
 import com.ra.repository.CategoryRepository;
@@ -52,7 +53,7 @@ public class CategoryServiceImp implements CategoryService {
     }
 
     @Override
-    public CategoryResponseDto update(Long id, CategoryRequestDto requestDto) {
+    public CategoryResponseDto update(Long id, CategoryUpdateRequestDto requestDto) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(()->new CustomException("Category not found"));
         boolean isUpdate = false;

@@ -9,6 +9,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class WishListRequestDto {
-    private Long productId;
+public class CategoryUpdateRequestDto {
+    private String catName;
+    private String catDesc;
+    private Boolean status;
 }

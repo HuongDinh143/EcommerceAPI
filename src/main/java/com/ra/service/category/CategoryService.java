@@ -1,6 +1,7 @@
 package com.ra.service.category;
 
 import com.ra.model.dto.request.CategoryRequestDto;
+import com.ra.model.dto.request.CategoryUpdateRequestDto;
 import com.ra.model.dto.response.CategoryResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +13,6 @@ public interface CategoryService {
     Page<CategoryResponseDto> findAll(Pageable pageable);
     CategoryResponseDto findById(Long id);
     CategoryResponseDto create(CategoryRequestDto categoryRequestDto);
-    CategoryResponseDto update(Long id, CategoryRequestDto categoryRequestDto);
+    CategoryResponseDto update(Long id, CategoryUpdateRequestDto requestDto);
     void delete(Long id);
 }

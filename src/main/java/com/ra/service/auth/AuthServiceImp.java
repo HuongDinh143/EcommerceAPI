@@ -86,7 +86,7 @@ public class AuthServiceImp implements AuthService {
     }
 
     @Override
-    public UserResponseDto updatePermission(UserPermissionDto request, Long userId) throws Exception {
+    public UserResponseDto updatePermission(UserPermissionDto request, Long userId){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException("Không tìm thấy người dùng"));
 
@@ -104,7 +104,7 @@ public class AuthServiceImp implements AuthService {
     }
 
     @Override
-    public UserResponseDto removePermission(UserPermissionDto request, Long userId) throws Exception {
+    public UserResponseDto removePermission(UserPermissionDto request, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException("Không tìm thấy người dùng"));
 
@@ -127,6 +127,7 @@ public class AuthServiceImp implements AuthService {
 
     private UserResponseDto toDto(User user) {
         return UserResponseDto.builder()
+                .id(user.getId())
                 .username(user.getUsername())
                 .fullName(user.getFullName())
                 .phone(user.getPhone())

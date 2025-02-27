@@ -6,10 +6,12 @@ import com.ra.model.dto.response.UserResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface UserService {
     Page<UserResponseDto> pagination(Pageable pageable);
-    void updateStatusUser(Long userId) throws Exception;
-    UserResponseDto findByName(String username);
+    UserResponseDto updateStatusUser(Long userId);
+    List<UserResponseDto> findByName(String username);
     UserResponseDto findById(Long id);
     UserResponseDto updateUser(Long id, UserUpdateRequestDto requestDto);
     void changePassword(Long userId, ChangePasswordRequestDto requestDto);

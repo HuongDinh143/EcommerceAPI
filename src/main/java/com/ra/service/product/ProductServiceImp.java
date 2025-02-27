@@ -90,11 +90,11 @@ public class ProductServiceImp implements ProductService {
     @Override
     public List<ProductCartResponseDto> getProductsInCart(Long userId) {
         ShoppingCart cart = shoppingCartRepository.findByUserId(userId)
-                .orElseThrow(() -> new CustomException("ShoppingCart not found for user id: " + userId));
+                .orElseThrow(() -> new CustomException("ShoppingCart không tìm thấy user có id : " + userId));
         List<ProductCartResponseDto> listProduct = new ArrayList<>();
         for (CartItem item : cart.getItems()) {
-            Product product = productRepository.findById(item.getId())
-                    .orElseThrow(()-> new CustomException("Product not found for product id: " + item.getProduct().getId()));
+            Product product = productRepository.findById(item.getProduct().getId())
+                    .orElseThrow(()-> new CustomException("Không tim thấy sản phẩm có id: " + item.getProduct().getId()));
             ProductCartResponseDto dto = new ProductCartResponseDto();
             dto.setProductId(product.getId());
             dto.setName(product.getProductName());
@@ -133,7 +133,7 @@ public class ProductServiceImp implements ProductService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(()->new CustomException("Product not found"));
         String fileName = product.getImage();
-        Boolean isUpdated = false;
+        boolean isUpdated = false;
         if (requestDto.getImage() != null) {
             fileName = uploadService.uploadFile(requestDto.getImage());
             product.setImage(fileName);

@@ -1,5 +1,6 @@
 package com.ra.model.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ra.model.entity.Role;
 import lombok.*;
 
@@ -11,6 +12,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserResponseDto {
     private Long id;
     private String username;
@@ -18,7 +20,9 @@ public class UserResponseDto {
     private String fullName;
     private String phone;
     private String address;
+    private Boolean status;
     private LocalDate createdAt;
+    private LocalDate updatedAt;
     private Set<Role> roles;
 
 

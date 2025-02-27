@@ -57,21 +57,15 @@ public class WishListServiceImp implements WishListService {
     }
 
     @Override
-    public void removeProductFromWishList(Long userId, Long productId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException("Không tìm thấy người dùng"));
-
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new CustomException("Không tìm thấy sản phẩm"));
-
-        WishList wishList = Optional.ofNullable(wishListRepository.findByUserAndProduct(user, product))
-                .orElseThrow(() -> new CustomException("Không tìm thấy sản phẩm trong danh sách yêu thích"));
-
+    public void removeProductFromWishList(Long userId, Long wishListId) {
+        WishList wishList = wishListRepository.findById(wishListId)
+                .orElseThrow(()->new CustomException("Không tìm thấy wishList"));
         wishListRepository.delete(wishList);
     }
 
     private WishListResponseDto toWishListDto(WishList wishList) {
         return WishListResponseDto.builder()
+                .id(wishList.getId())
                 .productId(wishList.getProduct().getId())
                 .productName(wishList.getProduct().getProductName())
                 .build();

@@ -11,4 +11,5 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
     List<OrderDetail> findTop10ByOrderByOrderQuantityDesc();
     List<OrderDetail> findByOrder_CreatedAtBetween(LocalDate from, LocalDate to);
     List<OrderDetail> findByOrder(Order order);
+
 }

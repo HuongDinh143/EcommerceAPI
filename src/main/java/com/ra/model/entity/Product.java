@@ -35,6 +35,8 @@ public class Product {
     private LocalDate updatedAt;
     @Column(name = "is_featured")
     private Boolean isFeatured;
+    @Column(name = "total_sold")
+    private Long totalSold;
     @ManyToOne
     @JoinColumn(name = "cat_id",referencedColumnName = "id")
     private Category category;

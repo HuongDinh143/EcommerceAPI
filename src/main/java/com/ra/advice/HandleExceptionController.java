@@ -1,6 +1,7 @@
 package com.ra.advice;
 
 import com.ra.exception.CustomException;
+import com.ra.exception.OrderCheckException;
 import com.ra.exception.OrderStatusException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -32,5 +33,11 @@ public class HandleExceptionController {
     public DataError<?> handlerOrderStatusException(OrderStatusException exception){
         return  new DataError<>(500,exception.getMessage());
     }
+
+    @ExceptionHandler(OrderCheckException.class)
+    public DataError<Map<String, String>> handlerOrderCheckException(OrderCheckException exception) {
+        return new DataError<>(500, exception.getFieldErrors());
+    }
+
 
 }
