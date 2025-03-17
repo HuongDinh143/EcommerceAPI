@@ -1,5 +1,6 @@
 package com.ra.controller;
 
+import com.ra.model.dto.response.ApiResponse;
 import com.ra.model.dto.response.ProductResponseDto;
 import com.ra.service.product.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class ProductController {
     @Autowired
     private ProductService productService;
     @GetMapping
-    public ResponseEntity<Page<ProductResponseDto>> getAllProducts(
+    public ApiResponse<Page<ProductResponseDto>> getAllProducts(
             @RequestParam(name = "page",defaultValue = "0") int page,
             @RequestParam(name = "limit",defaultValue = "10") int limit,
             @RequestParam(name = "sortBy",defaultValue = "createdAt") String sortBy,
@@ -30,45 +31,45 @@ public class ProductController {
                 .ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, limit, sort);
         Page<ProductResponseDto> responseDtos = productService.pagination(pageable);
-        return new ResponseEntity<>(responseDtos, HttpStatus.OK);
+        return new ApiResponse<>(200,"Danh sach Sp",responseDtos);
     }
 
     @GetMapping("/search/{searchValue}")
-    public ResponseEntity<List<ProductResponseDto>> searchProducts(
+    public ApiResponse<List<ProductResponseDto>> searchProducts(
             @PathVariable String searchValue) {
         List<ProductResponseDto> listResult = productService.search(searchValue);
-        return new ResponseEntity<>(listResult, HttpStatus.OK);
+        return new ApiResponse<>(200,"Ket qua tim kiem",listResult);
     }
 
     @GetMapping("/featured-products")
-    public ResponseEntity<List<ProductResponseDto>> getFeaturedProducts() {
+    public ApiResponse<List<ProductResponseDto>> getFeaturedProducts() {
         List<ProductResponseDto> featuredProducts = productService.getFeaturedProducts();
-        return new ResponseEntity<>(featuredProducts, HttpStatus.OK);
+        return new ApiResponse<>(200,"Danh sach sp ua chuong",featuredProducts);
     }
 
     @GetMapping("/best-seller-products")
-    public ResponseEntity<List<ProductResponseDto>> getBestSale() {
+    public ApiResponse<List<ProductResponseDto>> getBestSale() {
         List<ProductResponseDto> bestSaleProducts = productService.getTop10SaleProducts();
-        return new ResponseEntity<>(bestSaleProducts, HttpStatus.OK);
+        return new ApiResponse<>(200,"Danh sach sp ban chay",bestSaleProducts);
     }
 
     @GetMapping("/new-products")
-    public ResponseEntity<List<ProductResponseDto>> getNewProducts() {
+    public ApiResponse<List<ProductResponseDto>> getNewProducts() {
         List<ProductResponseDto> newProducts = productService.getNewProduct();
-        return new ResponseEntity<>(newProducts, HttpStatus.OK);
+        return new ApiResponse<>(200,"Danh sach sp moi",newProducts);
     }
 
     @GetMapping("/categories/{categoryId}")
-    public ResponseEntity<List<ProductResponseDto>> getProductsByCategoryId(@PathVariable Long categoryId
+    public ApiResponse<List<ProductResponseDto>> getProductsByCategoryId(@PathVariable Long categoryId
     ) throws Exception {
         List<ProductResponseDto> products = productService.getProductByCategory(categoryId);
-        return new ResponseEntity<>(products, HttpStatus.OK);
+        return new ApiResponse<>(200,"Danh sach sp theo danh muc",products);
     }
 
     @GetMapping("/{productId}")
-    public ResponseEntity<ProductResponseDto> getProductById(@PathVariable Long productId) throws Exception {
+    public ApiResponse<ProductResponseDto> getProductById(@PathVariable Long productId) throws Exception {
         ProductResponseDto product = productService.getProductById(productId);
-        return new ResponseEntity<>(product, HttpStatus.OK);
+        return new ApiResponse<>(200,"Lay sp theo productId",product);
     }
 
 

@@ -1,13 +1,13 @@
 package com.ra.controller;
 
-import com.ra.model.dto.*;
+import com.ra.model.dto.UserPermissionDto;
 import com.ra.model.dto.request.CategoryRequestDto;
 import com.ra.model.dto.request.CategoryUpdateRequestDto;
 import com.ra.model.dto.request.OrderRequestDto;
 import com.ra.model.dto.request.ProductRequestDto;
 import com.ra.model.dto.response.*;
+import com.ra.model.entity.Order;
 import com.ra.model.entity.Role;
-import com.ra.model.entity.User;
 import com.ra.service.auth.AuthService;
 import com.ra.service.category.CategoryService;
 import com.ra.service.order.OrderService;
@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -47,7 +48,7 @@ public class AdminController {
     private ReportService reportService;
 
     @GetMapping("/users")
-    public ResponseEntity<?> getAllUsers(
+    public ApiResponse<?> getAllUsers(
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "limit", defaultValue = "5") int limit,
             @RequestParam(name = "sortBy", defaultValue = "username") String sortBy,
@@ -56,178 +57,215 @@ public class AdminController {
         Sort sort = orderBy.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, limit, sort);
         Page<UserResponseDto> responseDtos = userService.pagination(pageable);
-        return new ResponseEntity<>(responseDtos, HttpStatus.OK);
+        return new ApiResponse<>(200, "Danh sach nguoi dung", responseDtos);
 
     }
+
     @PatchMapping("users/{id}")
-    public ResponseEntity<?> updatePermissionUser(@RequestBody @Valid UserPermissionDto userPermissionDTO, @PathVariable String id) {
+    public ApiResponse<?> updatePermissionUser(@RequestBody @Valid UserPermissionDto userPermissionDTO, @PathVariable String id) {
         UserResponseDto userResponseDto = authService.updatePermission(userPermissionDTO, Long.valueOf(id));
-        return new ResponseEntity<>(userResponseDto, HttpStatus.OK);
+
+        return new ApiResponse<>(200, "Them quyen thanh cong", userResponseDto);
     }
+
     @PatchMapping("/users/{id}/remove-role")
-    public ResponseEntity<?> removePermissionUser(
+    public ApiResponse<?> removePermissionUser(
             @RequestBody @Valid UserPermissionDto userPermissionDTO,
             @PathVariable Long id) {
 
         UserResponseDto userResponseDto = authService.removePermission(userPermissionDTO, id);
-        return new ResponseEntity<>(userResponseDto, HttpStatus.OK);
+        return new ApiResponse<>(200, "xoa quyen thanh cong", userResponseDto);
     }
+
     @PutMapping("/users/{userId}")
-    public ResponseEntity<?> updateStatusUser(@PathVariable Long userId) {
-        UserResponseDto userResponseDto= userService.updateStatusUser(userId);
-        if (userResponseDto.getStatus()){
-            return ResponseEntity.ok("Mở khóa thành công");
-        }else{
-            return ResponseEntity.ok("Khóa thành công");
+    public ApiResponse<?> updateStatusUser(@PathVariable Long userId) {
+        UserResponseDto userResponseDto = userService.updateStatusUser(userId);
+        if (userResponseDto.getStatus()) {
+            return new ApiResponse<>(200, "Mo khoa thanh cong", userResponseDto);
+        } else {
+            return new ApiResponse<>(200, "Khoa thanh cong", userResponseDto);
         }
 
     }
+
     @GetMapping("/roles")
-    public ResponseEntity<?> getAllRoles(){
+    public ApiResponse<?> getAllRoles() {
         List<Role> roles = roleService.getRoles();
-        return new ResponseEntity<>(roles, HttpStatus.OK);
+        return new ApiResponse<>(200, "Danh sach quyen", roles);
     }
+
     @GetMapping("/users/{search}")
-    public ResponseEntity<List<UserResponseDto>> searchUsers( @PathVariable String search) {
+    public ApiResponse<List<UserResponseDto>> searchUsers(@PathVariable String search) {
         List<UserResponseDto> users = userService.findByName(search);
-        return new ResponseEntity<>(users, HttpStatus.OK);
+        return new ApiResponse<>(200, "Tim nguoi dung theo ten", users);
     }
+
     @GetMapping("/products")
-    public ResponseEntity<Page<ProductResponseDto>> getAllProducts(
-            @RequestParam(name = "page",defaultValue = "0") int page,
-            @RequestParam(name = "limit",defaultValue = "10") int limit,
-            @RequestParam(name = "sortBy",defaultValue = "createdAt") String sortBy,
-            @RequestParam(name = "orderBy",defaultValue = "asc") String orderBy
+    public ApiResponse<Page<ProductResponseDto>> getAllProducts(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "limit", defaultValue = "10") int limit,
+            @RequestParam(name = "sortBy", defaultValue = "createdAt") String sortBy,
+            @RequestParam(name = "orderBy", defaultValue = "asc") String orderBy
 
     ) {
         Sort sort = orderBy.equalsIgnoreCase("asc") ? Sort.by(sortBy)
                 .ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, limit, sort);
         Page<ProductResponseDto> responseDtos = productService.pagination(pageable);
-        return new ResponseEntity<>(responseDtos, HttpStatus.OK);
+        return new ApiResponse<>(200, "Danh sach san pham", responseDtos);
     }
+
     @GetMapping("/products/{id}")
-    public ResponseEntity<ProductResponseDto> getProductById(@PathVariable Long id) {
+    public ApiResponse<ProductResponseDto> getProductById(@PathVariable Long id) {
         ProductResponseDto product = productService.getProductById(id);
-        return new ResponseEntity<>(product, HttpStatus.OK);
+        return new ApiResponse<>(200, "Lay ve san pham theo id", product);
     }
+
     @PostMapping("products")
-    public ResponseEntity<ProductResponseDto> createProduct(@ModelAttribute ProductRequestDto requestDto){
+    public ApiResponse<ProductResponseDto> createProduct(@ModelAttribute ProductRequestDto requestDto) {
         ProductResponseDto productResponseDto = productService.addNewProduct(requestDto);
-        return new ResponseEntity<>(productResponseDto, HttpStatus.CREATED);
+        return new ApiResponse<>(200, "Them san pham thanh cong", productResponseDto);
     }
+
     @PutMapping("/products/{id}")
-    public ResponseEntity<ProductResponseDto> updateProduct(@PathVariable Long id,@ModelAttribute ProductRequestDto requestDto){
-        ProductResponseDto productResponseDto = productService.updateProduct(id,requestDto);
-        return new ResponseEntity<>(productResponseDto, HttpStatus.OK);
+    public ApiResponse<ProductResponseDto> updateProduct(@PathVariable Long id, @ModelAttribute ProductRequestDto requestDto) {
+        ProductResponseDto productResponseDto = productService.updateProduct(id, requestDto);
+        return new ApiResponse<>(200, "Update san pham thanh cong", productResponseDto);
     }
+
     @DeleteMapping("/products/{id}")
-    public ResponseEntity<?> deleteProduct(@PathVariable Long id){
+    public ApiResponse<?> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
-        return ResponseEntity.ok("Xóa sản phẩm thành công");
+        return new ApiResponse<>(200, "Xoa san pham thanh cong", id);
     }
+
     @GetMapping("/categories")
-    public ResponseEntity<Page<CategoryResponseDto>> getAllCategories(
-            @RequestParam(value = "page",defaultValue = "0") int page,
-            @RequestParam(value = "limit",defaultValue = "5") int limit,
-            @RequestParam(value = "sortBy",defaultValue = "catName") String sortBy,
-            @RequestParam(value = "orderBy",defaultValue = "asc") String orderBy
-    ){
-        Sort sort = orderBy.equalsIgnoreCase("asc")? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+    public ApiResponse<Page<CategoryResponseDto>> getAllCategories(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "limit", defaultValue = "5") int limit,
+            @RequestParam(value = "sortBy", defaultValue = "catName") String sortBy,
+            @RequestParam(value = "orderBy", defaultValue = "asc") String orderBy
+    ) {
+        Sort sort = orderBy.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, limit, sort);
         Page<CategoryResponseDto> responseDtos = categoryService.findAll(pageable);
-        return new ResponseEntity<>(responseDtos, HttpStatus.OK);
+        return new ApiResponse<>(200, "Danh sach danh muc", responseDtos);
     }
+
     @GetMapping("/categories/{id}")
-    public ResponseEntity<CategoryResponseDto> getCategoryById(@PathVariable Long id){
+    public ApiResponse<CategoryResponseDto> getCategoryById(@PathVariable Long id) {
         CategoryResponseDto responseDto = categoryService.findById(id);
-        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+        return new ApiResponse<>(200, "Lay ve danh muc theo id", responseDto);
     }
+
     @PostMapping("/categories")
-    public ResponseEntity<CategoryResponseDto> create(@Valid @RequestBody CategoryRequestDto requestDto){
+    public ApiResponse<CategoryResponseDto> create(@Valid @RequestBody CategoryRequestDto requestDto) {
         CategoryResponseDto responseDto = categoryService.create(requestDto);
-        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
+        return new ApiResponse<>(200, "Them moi danh muc thanh cong", responseDto);
     }
+
     @PutMapping("/categories/{id}")
-    public ResponseEntity<CategoryResponseDto> update(@PathVariable Long id,@RequestBody CategoryUpdateRequestDto requestDto){
-        CategoryResponseDto responseDto = categoryService.update(id,requestDto);
-        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    public ApiResponse<CategoryResponseDto> update(@PathVariable Long id, @RequestBody CategoryUpdateRequestDto requestDto) {
+        CategoryResponseDto responseDto = categoryService.update(id, requestDto);
+        return new ApiResponse<>(200, "Update danh muc thanh cong", responseDto);
     }
+
     @DeleteMapping("/categories/{id}")
-    public void delete(@PathVariable Long id){
+    public ApiResponse<?> delete(@PathVariable Long id) {
         categoryService.delete(id);
+        return new ApiResponse<>(200, "Xoa danh muc thanh cong", id);
     }
+
     @GetMapping("/orders")
-    public ResponseEntity<List<OrderResponseDto>> getAllOrders(){
+    public ApiResponse<List<OrderResponseDto>> getAllOrders() {
         List<OrderResponseDto> orders = orderService.getAllOrders();
-        return new ResponseEntity<>(orders,HttpStatus.OK);
+        return new ApiResponse<>(200, "Danh sach don hang", orders);
     }
+
     @GetMapping("/orders/status/{status}")
-    public ResponseEntity<?> getOrderStatus(@PathVariable String status) {
+    public ApiResponse<?> getOrderStatus(@PathVariable String status) {
         try {
             List<OrderResponseDto> orderResponseDtos = orderService.findAllByStatus(status);
-            return ResponseEntity.ok(orderResponseDtos);
+            return new ApiResponse<>(200, "Lay danh sach don hang theo trang thai", orderResponseDtos);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body("Invalid order status: " + status);
+            return new ApiResponse<>(401, "Trang thai don hang khong hop le", status);
         }
     }
+
     @GetMapping("/orders/{id}")
-    public ResponseEntity<OrderResponseDto> getOrderById(@PathVariable Long id){
+    public ApiResponse<OrderResponseDto> getOrderById(@PathVariable Long id) {
         OrderResponseDto orderResponseDto = orderService.findById(id);
-        return new ResponseEntity<>(orderResponseDto, HttpStatus.OK);
+        return new ApiResponse<>(200, "Lay don hang theo id", orderResponseDto);
     }
+
     @PutMapping("/orders/{id}")
-    public ResponseEntity<OrderResponseDto> updateOrderStatus(@PathVariable Long id,@RequestBody OrderRequestDto requestDto){
-        OrderResponseDto orderResponseDto = orderService.updateOrderStatus(id,requestDto);
-        return new ResponseEntity<>(orderResponseDto, HttpStatus.OK);
+    public ApiResponse<OrderResponseDto> updateOrderStatus(@PathVariable Long id, @RequestBody OrderRequestDto requestDto) {
+        OrderResponseDto orderResponseDto = orderService.updateOrderStatus(id, requestDto);
+        return new ApiResponse<>(200, "Update trang thai don hang thanh cong", orderResponseDto);
     }
+
     @GetMapping("/orders/sales-revenue-over-time")
-    public ResponseEntity<?> getSalesRevenueOverTime(
-            @RequestParam LocalDate from,
-            @RequestParam LocalDate to) {
-        double revenue = orderService.findByCreatedAtBetween(from, to);
-        return new ResponseEntity<>(revenue, HttpStatus.OK);
+    public ApiResponse<Double> getSalesRevenueOverTime(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+
+        double revenue = orderService.salesRevenueOverTime(Order.Status.SUCCESS, from, to);
+
+        String message = String.format("Doanh thu bán hàng theo thời gian từ %s đến %s", from, to);
+
+        return new ApiResponse<>(200, message, revenue);
     }
+
     @GetMapping("/reports/best-seller-products")
-    public ResponseEntity<?> getBestSellerProducts(
+    public ApiResponse<?> getBestSellerProducts(
             @RequestParam LocalDate from,
             @RequestParam LocalDate to) {
         List<BestSellerProductDto> bestSellers = reportService.getBestSellerProducts(from, to);
-        return new ResponseEntity<>(bestSellers, HttpStatus.OK);
+        String message = String.format("Danh sach san pham ban chay tu %s den %s", from, to);
+        return new ApiResponse<>(200, message, bestSellers);
     }
+
     @GetMapping("/reports/most-liked-products")
-    public ResponseEntity<?> getMostLikedProducts(
+    public ApiResponse<?> getMostLikedProducts(
             @RequestParam LocalDate from,
             @RequestParam LocalDate to) {
 
         List<MostLikedProductDto> mostLikedProducts = reportService.getMostLikedProducts(from, to);
-        return new ResponseEntity<>(mostLikedProducts, HttpStatus.OK);
+        String message = String.format("Danh sach san pham yeu thich tu %s den %s", from, to);
+        return new ApiResponse<>(200, message, mostLikedProducts);
     }
+
     @GetMapping("/reports/revenue-by-category")
-    public ResponseEntity<?> getRevenueByCategory(
+    public ApiResponse<?> getRevenueByCategory(
             @RequestParam LocalDate from,
             @RequestParam LocalDate to) {
 
         List<RevenueByCategoryDto> revenueByCategory = reportService.getRevenueByCategory(from, to);
-        return new ResponseEntity<>(revenueByCategory, HttpStatus.OK);
+        String message = String.format("Doanh thu theo danh muc tu %s den %s", from, to);
+        return new ApiResponse<>(200, message, revenueByCategory);
     }
+
     @GetMapping("/reports/top-spending-customers")
-    public ResponseEntity<?> getTopSpendingCustomers(
+    public ApiResponse<?> getTopSpendingCustomers(
             @RequestParam LocalDate from,
             @RequestParam LocalDate to
-    ){
+    ) {
         List<TopSpendingResponseDto> topSpending = reportService.getTopSpending(from, to);
-        return new ResponseEntity<>(topSpending, HttpStatus.OK);
+        String message = String.format("Tops khach hang mua hang nhieu nhat tu %s den %s", from, to);
+        return new ApiResponse<>(200, message, topSpending);
     }
+
     @GetMapping("/reports/new-accounts-this-month")
-    public ResponseEntity<?> getNewAccountsThisMonth(){
+    public ApiResponse<?> getNewAccountsThisMonth() {
         List<UserResponseDto> newAccounts = reportService.getNewAccountsThisMonth();
-        return new ResponseEntity<>(newAccounts, HttpStatus.OK);
+        return new ApiResponse<>(200, "New accounts this month", newAccounts);
     }
+
     @GetMapping("reports/invoices-over-time")
-    public ResponseEntity<?> getInvoicesOverTime(@RequestParam LocalDate from, @RequestParam LocalDate to) {
+    public ApiResponse<?> getInvoicesOverTime(@RequestParam LocalDate from, @RequestParam LocalDate to) {
         long invoiceCount = reportService.countInvoicesOverTime(from, to);
-        return new ResponseEntity<>(invoiceCount, HttpStatus.OK);
+        String message = String.format("Thống kê số lượng hóa đơn bán ra tu %s den %s", from, to);
+        return new ApiResponse<>(200, message, invoiceCount);
     }
 
 

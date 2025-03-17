@@ -87,10 +87,6 @@ public class OrderServiceImp implements OrderService {
         return toDto(order);
     }
 
-
-    /**
-     * Cập nhật tổng số lượng sản phẩm đã bán khi đơn hàng SUCCESS
-     */
     private void updateProductTotalSold(Order order) {
         for (OrderDetail item : order.getOrderDetails()) {
             Product product = item.getProduct();
@@ -99,9 +95,6 @@ public class OrderServiceImp implements OrderService {
         }
     }
 
-    /**
-     * Hoàn lại số lượng tồn kho khi đơn hàng bị CANCEL
-     */
     private void restoreStock(Order order) {
         for (OrderDetail item : order.getOrderDetails()) {
             Product product = item.getProduct();
@@ -110,22 +103,22 @@ public class OrderServiceImp implements OrderService {
         }
     }
 
-    /**
-     * Kiểm tra trạng thái hợp lệ (chỉ cho phép tiến về phía trước)
-     */
     private boolean isValidStatusTransition(Order.Status currentStatus, Order.Status newStatus) {
         return switch (currentStatus) {
             case WAITING -> newStatus == Order.Status.CONFIRM || newStatus == Order.Status.CANCEL;
             case CONFIRM -> newStatus == Order.Status.DELIVERY;
             case DELIVERY -> newStatus == Order.Status.SUCCESS;
-            case SUCCESS, CANCEL -> false; // Không thể cập nhật từ SUCCESS hoặc CANCEL
+            case SUCCESS, CANCEL -> false;
         };
     }
 
     @Override
-    public double findByCreatedAtBetween(LocalDate from, LocalDate to) {
-        return orderRepository.findByCreatedAtBetween(from, to)
-                .stream()
+    public double salesRevenueOverTime(Order.Status status, LocalDate from, LocalDate to) {
+        List<Order> orders = orderRepository.findByStatusAndCreatedAtBetween(Order.Status.SUCCESS, from, to);
+        if (from.isAfter(to)) {
+            throw new CustomException("Ngày bắt đầu (from) không thể lớn hơn ngày kết thúc (to)");
+        }
+        return orders.stream()
                 .mapToDouble(Order::getTotalPrice)
                 .sum();
     }
